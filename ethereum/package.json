@@ -1,0 +1,28 @@
+{
+  "name": "wormhole",
+  "version": "1.0.0",
+  "description": "",
+  "main": "networks.js",
+  "devDependencies": {
+    "@chainsafe/truffle-plugin-abigen": "0.0.1",
+    "@openzeppelin/cli": "^2.8.2",
+    "@openzeppelin/contracts": "^3.2.0",
+    "@openzeppelin/test-environment": "^0.1.6",
+    "@openzeppelin/test-helpers": "^0.5.9",
+    "@truffle/hdwallet-provider": "^1.2.0",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "truffle": "^5.1.53",
+    "truffle-assertions": "^0.9.2"
+  },
+  "scripts": {
+    "build": "truffle compile",
+    "test": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle test",
+    "migrate": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle migrate"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ganache-cli": "^6.12.1"
+  }
+}

@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package gossip.v1;
+
+option go_package = "proto/gossip/v1;gossipv1";
+
+message GossipMessage {
+  oneof message {
+    Heartbeat heartbeat = 1;
+    SignedObservation signed_observation = 2;
+  }
+}
+
+// P2P gossip heartbeats for network introspection purposes. ALL FIELDS ARE UNTRUSTED.
+message Heartbeat {
+  // The node's arbitrarily chosen, untrusted nodeName.
+  string node_name = 1;
+  // A monotonic counter that resets to zero on startup.
+  int64 counter = 2;
+  // UNIX wall time.
+  int64 timestamp = 3;
+
+  message Network {
+    // Canonical chain ID.
+    uint32 id = 1;
+    // Consensus height of the node.
+    int64 height = 2;
+    // Chain-specific human-readable representation of the bridge contract address.
+    string bridge_address = 3;
+
+    // Fee payer account for this network, if present. Some networks like Ethereum do not use fee payer accounts.
+    message FeePayer {
+      // The account's on-chain balance.
+      int64 balance = 1;
+      // Chain-specific human-readable representation of the fee payer account's address.
+      string address = 2;
+    }
+    FeePayer fee_payer = 4;
+  }
+  repeated Network networks = 4;
+
+  // Human-readable representation of the current bridge node release.
+  string version = 5;
+
+  // Human-readable representation of the guardian key's address.
+  string guardian_addr = 6;
+
+  // TODO: include signed statement of gk public key?
+}
+
+// A SignedObservation is a signed statement by a given guardian node
+// that they observed a given event.
+//
+// Observations always result from an external, final event being observed.
+// Examples are lockups in finalized blocks on a block or guardian set changes
+// injected by node operators after reaching off-chain consensus.
+//
+// The event is uniquely identified by its hashed (tx_hash, nonce, values...) tuple.
+//
+// Other nodes will verify the signature. Once any node has observed a quorum of
+// guardians submitting valid signatures for a given hash, they can be assembled into a VAA.
+//
+// Messages without valid signature are dropped unceremoniously.
+message SignedObservation {
+  // Guardian pubkey as truncated eth address.
+  bytes addr = 1;
+  // The lockup's deterministic, unique hash.
+  bytes hash = 2;
+  // ECSDA signature of the hash using the node's guardian key.
+  bytes signature = 3;
+}
